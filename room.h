@@ -12,6 +12,9 @@ class Room : public QThread {
 public:
   ~Room() override;
 
+  void take(Client *client);
+  virtual welcome(Client *client);
+
 protected:
   void run() override;
 
@@ -20,7 +23,7 @@ signals:
 public slots:
 
 protected:
-  Room(const QString& name, QObject* parent = 0);
+  Room(const QString &name, QObject *parent = 0);
 
   QString name_;
 

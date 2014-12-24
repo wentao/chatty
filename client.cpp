@@ -5,20 +5,20 @@
 #include "room.h"
 #include "hall.h"
 
-void TrimRight(QString& str) {
-  while (str.size() > 0 && str.at(str.size() - 1).isSpace()) str.chop(1);
+void TrimRight(QString &str) {
+  while (str.size() > 0 && str.at(str.size() - 1).isSpace()) {
+    str.chop(1);
+  }
 }
 
 Client::Client(QObject *parent)
-  : QObject(parent), socket_(nullptr), room_(nullptr) {
-}
+    : QObject(parent), socket_(nullptr), room_(nullptr) {}
 
-Client::~Client() {
-}
+Client::~Client() {}
 
 bool Client::establishConnection(qintptr socketDescriptor) {
   socket_ = new QTcpSocket(this);
-  if(!socket_->setSocketDescriptor(socketDescriptor)) {
+  if (!socket_->setSocketDescriptor(socketDescriptor)) {
     qDebug() << "Can't initialize the connection to client" << socketDescriptor;
     return false;
   }
@@ -33,19 +33,6 @@ bool Client::establishConnection(qintptr socketDescriptor) {
   buffer_.clear();
 
   return true;
-}
-
-void Client::join(Room* room) {
-  if (room_ != nullptr) {
-    // TODO(wentao): clean up old room
-  }
-  moveToThread(room);
-  room_ = room;
-}
-
-void Client::leave() {
-  if (room_ == nullptr && room_ == Hall::Get()) return;
-  join(Hall::Get());
 }
 
 void Client::disconnected() {
@@ -72,15 +59,19 @@ void Client::readyRead() {
 
 void Client::processPendingMessages() {
   while (!pendingMessages_.empty()) {
-    const QString& msg = pendingMessages_.front();
+    const QString &msg = pendingMessages_.front();
     qDebug() << "... processing" << msg << msg.size();
     pendingMessages_.pop_front();
   }
 }
 
-void Client::transmit(QString msg) {
+void Client::transmit(QStringList msg) {
   if (socket_ != nullptr) {
-    socket_->write(msg.toUtf8());
+    for (int i = 0; i < msg.size(); ++i) {
+      socket_->write("> ");
+      socket_->write(msg.at(i).toUtf8());
+      socket_->write("\r\n"); // for telnet line termination
+    }
     socket_->flush();
   }
 }
