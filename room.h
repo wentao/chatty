@@ -1,22 +1,16 @@
 #ifndef ROOM_H
 #define ROOM_H
 
-#include <vector>
-
 #include <QThread>
 #include <QString>
 
-#include <client.h>
+class Client;
+class Hall;
 
 class Room : public QThread {
   Q_OBJECT
 public:
-  static Room* Hall() { return &hall_; }
-
-  Room(const QString& name = "", QObject* parent = 0);
   ~Room() override;
-
-  void accept(Client* client);
 
 protected:
   void run() override;
@@ -25,11 +19,12 @@ signals:
 
 public slots:
 
-private:
-  static Room hall_;
-  static std::vector<Room*> rooms_;
+protected:
+  Room(const QString& name, QObject* parent = 0);
 
   QString name_;
+
+  friend class Hall;
 };
 
 #endif // ROOM_H

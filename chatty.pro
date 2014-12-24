@@ -13,9 +13,11 @@ TEMPLATE = app
 SOURCES += main.cpp \
     room.cpp \
     client.cpp \
-    tcpserver.cpp
+    tcpserver.cpp \
+    hall.cpp
 
 HEADERS += \
     room.h \
     client.h \
-    tcpserver.h
+    tcpserver.h \
+    hall.h

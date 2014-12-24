@@ -1,13 +1,13 @@
 #include <QCoreApplication>
 #include <QTcpServer>
 
-#include <room.h>
+#include <hall.h>
 #include <tcpserver.h>
 
 int main(int argc, char *argv[]) {
   QCoreApplication a(argc, argv);
 
-  Room::Hall()->start();
+  Hall::Get()->start();
 
   TcpServer server;
   if (!server.listen(QHostAddress::LocalHost, 8237)) {

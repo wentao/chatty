@@ -8,6 +8,8 @@
 #include <QString>
 #include <QTcpSocket>
 
+class Room;
+
 class Client : public QObject {
   Q_OBJECT
 public:
@@ -15,14 +17,19 @@ public:
   ~Client() override;
 
   bool establishConnection(qintptr socketDescriptor);
+  void join(Room* room);
+  void leave();
 
 signals:
+  void send(QString msg);
 
 public slots:
   void disconnected();
   void readyRead();
 
   void processPendingMessages();
+
+  void transmit(QString msg);
 
 private:
   QString name_;
@@ -32,6 +39,8 @@ private:
 
   QByteArray buffer_;
   std::deque<QString> pendingMessages_;
+
+  Room* room_;
 };
 
 #endif // CLIENT_H
