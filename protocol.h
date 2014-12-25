@@ -16,10 +16,6 @@ public:
   virtual bool execute(const QString &input, QStringList *output);
   virtual bool finished();
 
-signals:
-
-public slots:
-
 private:
   int priority_;
 };
@@ -35,13 +31,23 @@ public:
   bool execute(const QString &input, QStringList *output) override;
   bool finished() override;
 
-private:
+protected:
   struct Argument {
     QString name;
     QString description;
+    QString value;
+
+    Argument(const QString &n, const QString &desc);
   };
 
+  void AddArgument(const QString &n, const QString &desc);
+
+  // This method will be called when all arguments values are fulfilled.
+  virtual bool execute(QStringList *output) = 0;
+
   std::vector<Argument> args_;
+  size_t index_;
+  bool firstExecution_;
 };
 
 #endif // PROTOCOL_H

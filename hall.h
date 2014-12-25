@@ -12,6 +12,7 @@
 
 class Login;
 class HallAction;
+class Join;
 
 class Hall : public Room {
   Q_OBJECT
@@ -43,6 +44,7 @@ private:
 
   friend class Login;
   friend class HallAction;
+  friend class Join;
 };
 
 class Login : public Protocol {
@@ -74,6 +76,21 @@ public:
 private:
   static QString actionList_;
 
+  Hall *hall_;
+  Client *client_;
+};
+
+class Join : public Command {
+public:
+  Join(Hall *hall, Client *client);
+  ~Join() override;
+
+  using Command::execute;
+
+protected:
+  bool execute(QStringList *output) override;
+
+private:
   Hall *hall_;
   Client *client_;
 };

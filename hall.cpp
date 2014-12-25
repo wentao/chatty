@@ -77,11 +77,12 @@ bool Login::execute(const QString &input, QStringList* output) {
 
 bool Login::finished() { return name_.length() > 0; }
 
-const char* kActionRooms = "/rooms";
-const char* kActionCreate = "/create";
-const char* kActionQuit = "/quit";
+const char *kActionRooms = "/rooms";
+const char *kActionCreate = "/create";
+const char *kActionQuit = "/quit";
+const char *kActionJoin = "/join";
 
-QString HallAction::actionList_("Commands you can use: /rooms, /create, /quit.");
+QString HallAction::actionList_("Commands you can use: /rooms, /create, /join, /quit.");
 
 HallAction::HallAction(Hall *hall, Client *client)
     : Protocol(), hall_(hall), client_(client) {}
@@ -102,6 +103,13 @@ bool HallAction::execute(const QString &input, QStringList* output) {
     *output << "create";
   } else if (head == kActionQuit) {
     *output << "BYE!";
+  } else if (head == kActionJoin) {
+    Join* join = new Join(hall_, client_);
+    if (!join->execute(input, output)) {
+      client_->registerProtocol(join);
+    } else {
+      delete join;
+    }
   } else {
     *output << actionList_;
   }
@@ -109,3 +117,27 @@ bool HallAction::execute(const QString &input, QStringList* output) {
 }
 
 bool HallAction::finished() { return false; }
+
+Join::Join(Hall *hall, Client *client)
+  : Command(), hall_(hall), client_(client) {
+  AddArgument("name", "the name of the room to join");
+}
+
+Join::~Join() {
+  qDebug() << "Join protocol destroyed";
+}
+
+bool Join::execute(QStringList *output) {
+  qDebug() << args_[0].value;
+  if (hall_->opens_.find(args_[0].value) == hall_->opens_.end()) {
+    *output << "Room ";
+    output->last().append(args_[0].value);
+    output->last().append(" doesn't exist.");
+    index_ = 0;
+    return false;
+  } else {
+    *output << "Joining room...";
+    return true;
+  }
+}
+
