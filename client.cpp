@@ -12,9 +12,11 @@ void TrimRight(QString &str) {
 }
 
 Client::Client(QObject *parent)
-    : QObject(parent), socket_(nullptr), room_(nullptr) {}
+  : QObject(parent), socket_(nullptr), room_(nullptr) {}
 
-Client::~Client() {}
+Client::~Client() {
+  qDebug() << "Client" << socketDescriptor_ << "destroyed";
+}
 
 bool Client::establishConnection(qintptr socketDescriptor) {
   socket_ = new QTcpSocket(this);
@@ -27,7 +29,9 @@ bool Client::establishConnection(qintptr socketDescriptor) {
 
   connect(socket_, &QTcpSocket::readyRead, this, &Client::readyRead);
   connect(socket_, &QTcpSocket::disconnected, this, &Client::disconnected);
-  connect(this, &Client::send, this, &Client::transmit);
+
+  connect(this, &Client::send, &Client::transmit);
+  connect(this, &Client::registerProtocol, &Client::protocolRegistration);
 
   qDebug() << "Client" << socketDescriptor << "connected";
   buffer_.clear();
@@ -39,15 +43,16 @@ void Client::disconnected() {
   qDebug() << "Client" << socketDescriptor_ << "disconnected";
   socketDescriptor_ = -1;
   socket_->deleteLater();
+
+
 }
 
 void Client::readyRead() {
   char ch;
   while (socket_->read(&ch, 1) == 1) {
     if (ch == '\n') {
-      QString msg(buffer_);
-      TrimRight(msg); // remove \r and other ending spaces
-      pendingMessages_.push_back(msg);
+      pendingMessages_.emplace_back(buffer_);
+      TrimRight(pendingMessages_.back()); // remove \r and other ending spaces
       buffer_.clear();
     } else {
       buffer_.append(ch);
@@ -60,7 +65,15 @@ void Client::readyRead() {
 void Client::processPendingMessages() {
   while (!pendingMessages_.empty()) {
     const QString &msg = pendingMessages_.front();
-    qDebug() << "... processing" << msg << msg.size();
+    if (!protocols_.empty()) {
+      QString response;
+      if (protocols_.top()->execute(msg, &response)) {
+        protocols_.pop();
+      }
+      if (!response.isEmpty()) writeMessage(response);
+    } else {
+      qDebug() << "ignore message" << msg;
+    }
     pendingMessages_.pop_front();
   }
 }
@@ -68,10 +81,21 @@ void Client::processPendingMessages() {
 void Client::transmit(QStringList msg) {
   if (socket_ != nullptr) {
     for (int i = 0; i < msg.size(); ++i) {
-      socket_->write("> ");
-      socket_->write(msg.at(i).toUtf8());
-      socket_->write("\r\n"); // for telnet line termination
+      writeMessage(msg.at(i));
     }
     socket_->flush();
+  }
+}
+
+void Client::writeMessage(const QString &msg) {
+  socket_->write("> ");
+  socket_->write(msg.toUtf8());
+  socket_->write("\r\n"); // for telnet line termination
+}
+
+void Client::protocolRegistration(Protocol *protocol) {
+  protocols_.emplace(protocol);
+  if (protocol->intro() != nullptr) {
+    writeMessage(*protocol->intro());
   }
 }

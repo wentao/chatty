@@ -2,6 +2,8 @@
 #define CLIENT_H
 
 #include <deque>
+#include <stack>
+#include <memory>
 
 #include <QByteArray>
 #include <QObject>
@@ -20,8 +22,14 @@ public:
 
   bool establishConnection(qintptr socketDescriptor);
 
+  const QString &name() const { return name_; }
+  void setName(const QString &name) { name_ = name; }
+
+  void setRoom(Room *room = nullptr) { room_ = room; }
+
 signals:
   void send(QStringList msg);
+  void registerProtocol(Protocol *protocol);
 
 public slots:
   void disconnected();
@@ -30,8 +38,11 @@ public slots:
   void processPendingMessages();
 
   void transmit(QStringList msg);
+  void protocolRegistration(Protocol *protocol);
 
 private:
+  void writeMessage(const QString &msg);
+
   QString name_;
 
   qintptr socketDescriptor_;
@@ -41,6 +52,7 @@ private:
   std::deque<QString> pendingMessages_;
 
   Room *room_;
+  std::stack<std::unique_ptr<Protocol>> protocols_;
 };
 
 #endif // CLIENT_H

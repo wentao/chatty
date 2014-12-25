@@ -9,9 +9,9 @@
 class Protocol {
 public:
   Protocol();
-  ~Protocol() override;
+  virtual ~Protocol();
 
-  virtual const QString &intro() const;
+  virtual const QString *intro() const;
 
   virtual bool execute(const QString &input, QString *output);
   virtual bool finished();

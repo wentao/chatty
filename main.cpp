@@ -7,7 +7,7 @@
 int main(int argc, char *argv[]) {
   QCoreApplication a(argc, argv);
 
-  Hall::Get()->start();
+  Hall::Get()->startLooper();
 
   TcpServer server;
   if (!server.listen(QHostAddress::LocalHost, 8237)) {

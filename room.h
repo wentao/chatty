@@ -1,22 +1,20 @@
 #ifndef ROOM_H
 #define ROOM_H
 
-#include <QThread>
+#include <QObject>
 #include <QString>
+#include <QThread>
 
 class Client;
 class Hall;
 
-class Room : public QThread {
+class Room : public QObject {
   Q_OBJECT
 public:
   ~Room() override;
 
-  void take(Client *client);
-  virtual welcome(Client *client);
-
-protected:
-  void run() override;
+  void startLooper();
+  virtual void welcome(Client *client);
 
 signals:
 
@@ -26,6 +24,7 @@ protected:
   Room(const QString &name, QObject *parent = 0);
 
   QString name_;
+  QThread looper_;
 
   friend class Hall;
 };
