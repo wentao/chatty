@@ -30,7 +30,6 @@ void Client::establishConnection(qintptr socketDescriptor) {
   connect(creator, &TcpHandleCreator::socketFailed, this, &Client::connectionFailed);
 
   creator->execute();
-  // QThreadPool::globalInstance()->start(creator);
 }
 
 void Client::socketReady(TcpHandle *socket) {

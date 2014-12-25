@@ -6,6 +6,7 @@
 #include <QTcpSocket>
 #include <QString>
 #include <QByteArray>
+#include <QThread>
 
 class TcpHandle : public QTcpSocket {
   Q_OBJECT
@@ -33,16 +34,23 @@ public:
   explicit TcpHandleCreator(qintptr socketDescriptor);
   ~TcpHandleCreator() override;
 
-  void execute() { run(); }
+  void execute();
 
 signals:
   void socketReady(TcpHandle *socket);
   void socketFailed();
 
+  void create();
+
+public slots:
+  void doCreation();
+
 protected:
   void run() override;
 
 private:
+  static QThread socketThread_;
+
   qintptr socketDescriptor_;
 };
 

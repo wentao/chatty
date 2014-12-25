@@ -40,12 +40,28 @@ void TcpHandle::transmit(QString msg) {
   write("\r\n"); // for telnet line termination
 }
 
+QThread TcpHandleCreator::socketThread_;
+
 TcpHandleCreator::TcpHandleCreator(qintptr socketDescriptor)
   : socketDescriptor_(socketDescriptor) {
   setAutoDelete(true);
+  connect(this, &TcpHandleCreator::create, this, &TcpHandleCreator::doCreation);
 }
 
 TcpHandleCreator::~TcpHandleCreator() {}
+
+void TcpHandleCreator::execute() {
+  if (!socketThread_.isRunning()) {
+    socketThread_.start();
+  }
+
+  moveToThread(&socketThread_);
+  emit create();
+}
+
+void TcpHandleCreator::doCreation() {
+  run();
+}
 
 void TcpHandleCreator::run() {
   TcpHandle *socket = new TcpHandle;
