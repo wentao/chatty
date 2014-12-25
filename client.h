@@ -29,11 +29,10 @@ public:
     qDebug() << "Client" << socketDescriptor_ << "logged in as" << name_;
   }
 
-  void setRoom(Room *room = nullptr) { room_ = room; }
-
 signals:
   void send(QStringList msg);
   void registerProtocol(Protocol *protocol);
+  void join(Room* room);
 
 public slots:
   void disconnected();
@@ -43,6 +42,8 @@ public slots:
 
   void transmit(QStringList msg);
   void protocolRegistration(Protocol *protocol);
+
+  void enterRoom(Room* room);
 
 private:
   void writeMessage(const QString &msg);

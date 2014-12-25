@@ -15,7 +15,6 @@ const char *kAbort = "/abort";
 
 QString Command::ParseHead(const QString &line) {
   QString head = line.section(kWhitespaces, 0, 0, QString::SectionSkipEmpty);
-  qDebug() << "head" << head;
   return head;
 }
 
@@ -51,7 +50,6 @@ bool Command::execute(const QString &input, QStringList *output) {
     ++index_;
   }
 
-  qDebug() << "index" << index_;
   bool ok = index_ == args_.size() && execute(output);
   if (!ok) {
     *output << args_[index_].description;

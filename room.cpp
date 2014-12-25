@@ -18,4 +18,18 @@ void Room::startLooper() {
 }
 
 void Room::welcome(Client *client) {
+  client->registerProtocol(new Talk(this, client));
+  QStringList userList;
+  userList << "users list...";
+  client->send(userList);
+}
+
+Talk::Talk(Room *room, Client *client) : room_(room), client_(client) {}
+
+Talk::~Talk() {}
+
+bool Talk::execute(const QString &input, QStringList *output) {
+  *output << client_->name();
+  output->last().append(": ").append(input);
+  return false;
 }

@@ -10,14 +10,25 @@ void TrimRight(QString &str) {
 }
 
 Client::Client(QObject *parent)
-  : QObject(parent), socket_(nullptr), room_(nullptr) {}
+  : QObject(parent), socket_(nullptr), room_(nullptr) {
+  connect(this, &Client::join, this, &Client::enterRoom, Qt::QueuedConnection);
+}
 
 Client::~Client() {
   qDebug() << "Client" << socketDescriptor_ << "destroyed";
 }
 
+void Client::enterRoom(Room *room) {
+  moveToThread(room->thread());
+  room_ = room;
+  if (room != nullptr) {
+    qDebug() << "Client" << socketDescriptor_ << "joined room" << room->name();
+  }
+  room->welcome(this);
+}
+
 bool Client::establishConnection(qintptr socketDescriptor) {
-  socket_ = new QTcpSocket(this);
+  socket_ = new QTcpSocket();
   if (!socket_->setSocketDescriptor(socketDescriptor)) {
     qDebug() << "Can't initialize the connection to client" << socketDescriptor;
     return false;
@@ -41,8 +52,6 @@ void Client::disconnected() {
   qDebug() << "Client" << socketDescriptor_ << "disconnected";
   socketDescriptor_ = -1;
   socket_->deleteLater();
-
-
 }
 
 void Client::readyRead() {

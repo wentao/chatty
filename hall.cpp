@@ -128,15 +128,17 @@ Join::~Join() {
 }
 
 bool Join::execute(QStringList *output) {
-  qDebug() << args_[0].value;
-  if (hall_->opens_.find(args_[0].value) == hall_->opens_.end()) {
+  auto it = hall_->opens_.find(args_[0].value);
+  if (it == hall_->opens_.end()) {
     *output << "Room ";
     output->last().append(args_[0].value);
     output->last().append(" doesn't exist.");
     index_ = 0;
     return false;
   } else {
-    *output << "Joining room...";
+    *output << "Joining room: ";
+    output->last().append(args_[0].value);
+    client_->join(it->second);
     return true;
   }
 }
