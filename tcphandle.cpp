@@ -4,7 +4,9 @@
 
 TcpHandle::TcpHandle(QObject *parent) : QTcpSocket(parent) {}
 
-TcpHandle::~TcpHandle() {}
+TcpHandle::~TcpHandle() {
+  qDebug() << "Socket destroyed";
+}
 
 void TcpHandle::init() {
   connect(this, &TcpHandle::readyRead, this, &TcpHandle::truncRead);
@@ -44,7 +46,9 @@ TcpHandleCreator::TcpHandleCreator(qintptr socketDescriptor)
   connect(this, &TcpHandleCreator::create, this, &TcpHandleCreator::doCreation);
 }
 
-TcpHandleCreator::~TcpHandleCreator() {}
+TcpHandleCreator::~TcpHandleCreator() {
+  qDebug() << "Socket creator destroyed";
+}
 
 void TcpHandleCreator::execute() {
   if (!socketThread_.isRunning()) {
@@ -70,4 +74,7 @@ void TcpHandleCreator::run() {
     delete socket;
     emit socketFailed();
   }
+
+  // TODO(wentao): remove this if we are using this class in QThreadPool
+  deleteLater();
 }
