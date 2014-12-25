@@ -1,7 +1,5 @@
 #include "client.h"
 
-#include <QThreadPool>
-
 #include "room.h"
 #include "hall.h"
 
@@ -55,8 +53,24 @@ void Client::disconnected() {
   socket_->deleteLater();
 }
 
-void Client::readyRead(QString msg) {
-  pendingMessages_.push_back(msg);
+inline void TrimRight(QString &str) {
+  while (str.size() > 0 && str.at(str.size() - 1).isSpace()) {
+    str.chop(1);
+  }
+}
+
+void Client::readyRead(QByteArray data) {
+  int n = data.indexOf('\n');
+  if (n < 0) {
+    buffer_.append(data);
+  } else {
+    QString msg(buffer_);
+    msg.append(data.left(n));
+    TrimRight(msg);
+    buffer_ = data.right(data.size() - n);
+    pendingMessages_.push_back(msg);
+  }
+
   processPendingMessages();
 }
 

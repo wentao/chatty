@@ -17,7 +17,7 @@ public:
   void init();
 
 signals:
-  void receive(QString msg);
+  void receive(QByteArray data);
   void send(QString msg);
 
 public slots:

@@ -2,12 +2,6 @@
 
 #include <QDebug>
 
-void TrimRight(QString &str) {
-  while (str.size() > 0 && str.at(str.size() - 1).isSpace()) {
-    str.chop(1);
-  }
-}
-
 TcpHandle::TcpHandle(QObject *parent) : QTcpSocket(parent) {}
 
 TcpHandle::~TcpHandle() {}
@@ -17,25 +11,18 @@ void TcpHandle::init() {
   connect(this, &TcpHandle::send, this, &TcpHandle::transmit);
 }
 
+constexpr int kReadBufferSize = 8192;
+
 void TcpHandle::truncRead() {
-  qDebug() << "reading...";
-  char ch;
-  while (read(&ch, 1) == 1) {
-    if (ch == '\n') {
-      QString msg(buffer_);
-      TrimRight(msg); // remove \r and other ending spaces
-      qDebug() << "receive" << msg;
-      emit receive(msg);
-      buffer_.clear();
-    } else {
-      buffer_.append(ch);
-    }
-  }
+  // Avoid the case when one socket has large amount to read, which might
+  // block other sockets from reading/writing.
+  receive(read(kReadBufferSize));
 }
 
 void TcpHandle::transmit(QString msg) {
-  qDebug() << "send" << msg;
   write("> ");
+  // TODO(wentao): figure out a better way to handle the case when
+  // msg is too large.
   write(msg.toUtf8());
   write("\r\n"); // for telnet line termination
 }

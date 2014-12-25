@@ -41,7 +41,7 @@ public slots:
   void socketReady(TcpHandle* socket);
 
   void disconnected();
-  void readyRead(QString msg);
+  void readyRead(QByteArray data);
 
   void processPendingMessages();
 
