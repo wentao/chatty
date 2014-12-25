@@ -32,11 +32,13 @@ void Hall::welcome(Client *client) {
 
 void Hall::newClient(qintptr socketDescriptor) {
   Client *client = new Client;
-  if (client->establishConnection(socketDescriptor)) {
+  connect(client, &Client::connected, [client, this]() {
     welcome(client);
-  } else {
-    delete client;
-  }
+  });
+  connect(client, &Client::connectionFailed, [client]() {
+    client->deleteLater();
+  });
+  client->establishConnection(socketDescriptor);
 }
 
 QString Login::welcome_("Welcome to chatty, please tell us your name:");

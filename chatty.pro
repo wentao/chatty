@@ -15,11 +15,13 @@ SOURCES += main.cpp \
     client.cpp \
     tcpserver.cpp \
     hall.cpp \
-    protocol.cpp
+    protocol.cpp \
+    tcphandle.cpp
 
 HEADERS += \
     room.h \
     client.h \
     tcpserver.h \
     hall.h \
-    protocol.h
+    protocol.h \
+    tcphandle.h

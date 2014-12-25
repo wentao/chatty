@@ -9,9 +9,9 @@
 #include <QDebug>
 #include <QObject>
 #include <QStringList>
-#include <QTcpSocket>
 
-#include <protocol.h>
+#include "protocol.h"
+#include "tcphandle.h"
 
 class Room;
 
@@ -21,7 +21,7 @@ public:
   explicit Client(QObject *parent = 0);
   ~Client() override;
 
-  bool establishConnection(qintptr socketDescriptor);
+  void establishConnection(qintptr socketDescriptor);
 
   const QString &name() const { return name_; }
   void setName(const QString &name) {
@@ -34,9 +34,14 @@ signals:
   void registerProtocol(Protocol *protocol);
   void join(Room* room);
 
+  void connected();
+  void connectionFailed();
+
 public slots:
+  void socketReady(TcpHandle* socket);
+
   void disconnected();
-  void readyRead();
+  void readyRead(QString msg);
 
   void processPendingMessages();
 
@@ -46,12 +51,10 @@ public slots:
   void enterRoom(Room* room);
 
 private:
-  void writeMessage(const QString &msg);
-
   QString name_;
 
   qintptr socketDescriptor_;
-  QTcpSocket *socket_;
+  TcpHandle *socket_;
 
   QByteArray buffer_;
   std::deque<QString> pendingMessages_;
