@@ -36,13 +36,16 @@ signals:
   void join(Room *room);
   void leave(Room *room);
 
+  void closeConnection();
   void connected();
   void connectionFailed();
 
 public slots:
   void socketReady(TcpHandle *socket);
 
-  void disconnected();
+  void disconnectedFromClient();
+  void disconnectedFromServer();
+
   void readyRead(QByteArray data);
 
   void processPendingMessages();

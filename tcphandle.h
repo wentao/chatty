@@ -20,9 +20,12 @@ signals:
   void receive(QByteArray data);
   void send(QString msg);
 
+  void shutdown();
+
 public slots:
   void transmit(QString msg);
   void truncRead();
+  void terminate();
 
 private:
   QByteArray buffer_;

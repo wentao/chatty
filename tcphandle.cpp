@@ -9,6 +9,7 @@ TcpHandle::~TcpHandle() {}
 void TcpHandle::init() {
   connect(this, &TcpHandle::readyRead, this, &TcpHandle::truncRead);
   connect(this, &TcpHandle::send, this, &TcpHandle::transmit);
+  connect(this, &TcpHandle::shutdown, this, &TcpHandle::terminate);
 }
 
 constexpr int kReadBufferSize = 8192;
@@ -16,15 +17,23 @@ constexpr int kReadBufferSize = 8192;
 void TcpHandle::truncRead() {
   // Avoid the case when one socket has large amount to read, which might
   // block other sockets from reading/writing.
-  receive(read(kReadBufferSize));
+  if (isOpen()) {
+    receive(read(kReadBufferSize));
+  }
 }
 
 void TcpHandle::transmit(QString msg) {
-  write("> ");
-  // TODO(wentao): figure out a better way to handle the case when
-  // msg is too large.
-  write(msg.toUtf8());
-  write("\r\n"); // for telnet line termination
+  if (isOpen()) {
+    write("> ");
+    // TODO(wentao): figure out a better way to handle the case when
+    // msg is too large.
+    write(msg.toUtf8());
+    write("\r\n"); // for telnet line termination
+  }
+}
+
+void TcpHandle::terminate() {
+  close();
 }
 
 QThread TcpHandleCreator::socketThread_;

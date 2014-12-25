@@ -32,6 +32,7 @@ signals:
 
 public slots:
   void newClient(qintptr socketDescriptor);
+  void quit(Client *client);
 
 private:
   static Hall hall_;

@@ -10,7 +10,7 @@ Client::Client(QObject *parent)
 }
 
 Client::~Client() {
-  qDebug() << "Client" << socketDescriptor_ << "destroyed";
+  qDebug() << "Client destroyed";
 }
 
 void Client::enterRoom(Room *room) {
@@ -23,8 +23,8 @@ void Client::enterRoom(Room *room) {
 }
 
 void Client::leaveRoom(Room *room) {
-  room_ = Hall::Get();
-  moveToThread(room_->thread());
+  room_ = nullptr;
+  moveToThread(Hall::Get()->thread());
 
   QString msg("You left the room: ");
   msg.append(room->name());
@@ -48,19 +48,31 @@ void Client::socketReady(TcpHandle *socket) {
   socket_ = socket;
   socketDescriptor_ = socket->socketDescriptor();
   connect(socket_, &TcpHandle::receive, this, &Client::readyRead);
-  connect(socket_, &TcpHandle::disconnected, this, &Client::disconnected);
+  connect(socket_, &TcpHandle::disconnected, this, &Client::disconnectedFromClient);
   qDebug() << "Client" << socketDescriptor_ << "connected";
   buffer_.clear();
 
   connect(this, &Client::send, &Client::transmit);
   connect(this, &Client::registerProtocol, &Client::protocolRegistration);
+  connect(this, &Client::closeConnection, &Client::disconnectedFromServer);
   emit connected();
 }
 
-void Client::disconnected() {
+void Client::disconnectedFromClient() {
   qDebug() << "Client" << socketDescriptor_ << "disconnected";
   socketDescriptor_ = -1;
+
+  if (room_ != nullptr) {
+    emit room_->leave(this);
+  }
+  emit Hall::Get()->leave(this);
+
   socket_->deleteLater();
+}
+
+void Client::disconnectedFromServer() {
+  socket_->shutdown();
+  // emit Hall::Get()->leave(this);
 }
 
 inline void TrimRight(QString &str) {

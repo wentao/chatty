@@ -10,6 +10,9 @@ std::map<QString, Room *> Hall::opens_;
 
 Hall::Hall(QObject *parent) : Room("", parent) {
   connect(this, &Hall::newConnection, &Hall::newClient);
+
+  disconnect(this, &Room::leave, this, &Room::left);
+  connect(this, &Room::leave, this, &Hall::quit);
 }
 
 Hall::~Hall() {}
@@ -39,6 +42,12 @@ void Hall::newClient(qintptr socketDescriptor) {
     client->deleteLater();
   });
   client->establishConnection(socketDescriptor);
+}
+
+void Hall::quit(Client *client) {
+  users_.erase(client->name());
+  qDebug() << "Client" << client->name() << "quit.";
+  client->deleteLater();
 }
 
 QString Login::welcome_("Welcome to chatty, please tell us your name:");
@@ -104,6 +113,7 @@ bool HallAction::execute(const QString &input, QStringList* output) {
   } else if (head == kActionCreate) {
     *output << "create";
   } else if (head == kActionQuit) {
+    emit client_->closeConnection();
     *output << "BYE!";
   } else if (head == kActionJoin) {
     Join* join = new Join(hall_, client_);
