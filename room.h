@@ -25,11 +25,18 @@ public:
   const QString &name() const { return name_; }
 
 signals:
+  void join(Client* client);
+  void leave(Client* client);
 
 public slots:
+  void joined(Client* client);
+  void left(Client* client);
 
 protected:
   Room(const QString &name, QObject *parent = 0);
+
+  QStringList userNameList(Client *client = 0);
+  void broadcast(QStringList msg, Client *except = 0);
 
   QString name_;
   QThread looper_;

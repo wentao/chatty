@@ -32,13 +32,15 @@ public:
 signals:
   void send(QStringList msg);
   void registerProtocol(Protocol *protocol);
-  void join(Room* room);
+
+  void join(Room *room);
+  void leave(Room *room);
 
   void connected();
   void connectionFailed();
 
 public slots:
-  void socketReady(TcpHandle* socket);
+  void socketReady(TcpHandle *socket);
 
   void disconnected();
   void readyRead(QByteArray data);
@@ -48,7 +50,8 @@ public slots:
   void transmit(QStringList msg);
   void protocolRegistration(Protocol *protocol);
 
-  void enterRoom(Room* room);
+  void enterRoom(Room *room);
+  void leaveRoom(Room *room);
 
 private:
   QString name_;

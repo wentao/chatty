@@ -6,6 +6,7 @@
 Client::Client(QObject *parent)
   : QObject(parent), socket_(nullptr), room_(nullptr) {
   connect(this, &Client::join, this, &Client::enterRoom, Qt::QueuedConnection);
+  connect(this, &Client::leave, this, &Client::leaveRoom, Qt::QueuedConnection);
 }
 
 Client::~Client() {
@@ -21,6 +22,19 @@ void Client::enterRoom(Room *room) {
   room->welcome(this);
 }
 
+void Client::leaveRoom(Room *room) {
+  room_ = Hall::Get();
+  moveToThread(room_->thread());
+
+  QString msg("You left the room: ");
+  msg.append(room->name());
+  emit send(QStringList(msg));
+
+  if (room != nullptr) {
+    qDebug() << "Client" << socketDescriptor_ << "left room" << room->name();
+  }
+}
+
 void Client::establishConnection(qintptr socketDescriptor) {
   TcpHandleCreator *creator = new TcpHandleCreator(socketDescriptor);
 
@@ -32,18 +46,14 @@ void Client::establishConnection(qintptr socketDescriptor) {
 
 void Client::socketReady(TcpHandle *socket) {
   socket_ = socket;
-
   socketDescriptor_ = socket->socketDescriptor();
-
   connect(socket_, &TcpHandle::receive, this, &Client::readyRead);
   connect(socket_, &TcpHandle::disconnected, this, &Client::disconnected);
-
-  connect(this, &Client::send, &Client::transmit);
-  connect(this, &Client::registerProtocol, &Client::protocolRegistration);
-
   qDebug() << "Client" << socketDescriptor_ << "connected";
   buffer_.clear();
 
+  connect(this, &Client::send, &Client::transmit);
+  connect(this, &Client::registerProtocol, &Client::protocolRegistration);
   emit connected();
 }
 
@@ -67,7 +77,7 @@ void Client::readyRead(QByteArray data) {
     QString msg(buffer_);
     msg.append(data.left(n));
     TrimRight(msg);
-    buffer_ = data.right(data.size() - n);
+    buffer_ = data.right(data.size() - n - 1);
     pendingMessages_.push_back(msg);
   }
 
