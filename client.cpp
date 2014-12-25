@@ -58,6 +58,12 @@ void Client::socketReady(TcpHandle *socket) {
   emit connected();
 }
 
+#define ASSERT_SOCKET_VALID \
+  if (socket_ == nullptr) { \
+  qDebug() << "Invalid state in client" << socketDescriptor_ << __LINE__; \
+  return; \
+  }
+
 void Client::disconnectedFromClient() {
   qDebug() << "Client" << socketDescriptor_ << "disconnected";
   socketDescriptor_ = -1;
@@ -67,12 +73,14 @@ void Client::disconnectedFromClient() {
   }
   emit Hall::Get()->leave(this);
 
+  ASSERT_SOCKET_VALID
   socket_->deleteLater();
+  socket_ = nullptr;
 }
 
 void Client::disconnectedFromServer() {
+  ASSERT_SOCKET_VALID
   socket_->shutdown();
-  // emit Hall::Get()->leave(this);
 }
 
 inline void TrimRight(QString &str) {
@@ -82,16 +90,16 @@ inline void TrimRight(QString &str) {
 }
 
 void Client::readyRead(QByteArray data) {
-  int n = data.indexOf('\n');
-  if (n < 0) {
-    buffer_.append(data);
-  } else {
-    QString msg(buffer_);
-    msg.append(data.left(n));
-    TrimRight(msg);
-    buffer_ = data.right(data.size() - n - 1);
-    pendingMessages_.push_back(msg);
+  buffer_.append(data);
+
+  int from = 0, to = -1;
+  while (from < buffer_.size() &&
+         (to = buffer_.indexOf('\n', from)) > -1) {
+    pendingMessages_.emplace_back(buffer_.mid(from, to - from));
+    TrimRight(pendingMessages_.back());
+    from = to + 1;
   }
+  buffer_ = buffer_.right(buffer_.size() - from);
 
   processPendingMessages();
 }
@@ -113,12 +121,14 @@ void Client::processPendingMessages() {
 }
 
 void Client::transmit(QStringList msg) {
+  ASSERT_SOCKET_VALID
   for (int i = 0; i < msg.size(); ++i) {
     emit socket_->send(msg.at(i));
   }
 }
 
 void Client::protocolRegistration(Protocol *protocol) {
+  ASSERT_SOCKET_VALID
   protocols_.emplace(protocol);
   if (protocol->intro() != nullptr) {
     emit socket_->send(*protocol->intro());
