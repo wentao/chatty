@@ -35,7 +35,6 @@ void Room::joined(Client *client) {
 
 void Room::left(Client *client) {
   users_.erase(client);
-  emit client->leave(this);
 
   QString msg(client->name());
   msg.append(" has left.");
@@ -72,6 +71,7 @@ bool Talk::execute(const QString &input, QStringList *output) {
   QString head = Command::ParseHead(input);
   if (head == kActionLeave) {
     emit room_->leave(client_);
+    emit client_->leave(room_);
     return true;
   } else {
     QString msg = client_->name();
