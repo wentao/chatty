@@ -6,6 +6,7 @@
 #include <memory>
 
 #include <QByteArray>
+#include <QDebug>
 #include <QObject>
 #include <QStringList>
 #include <QTcpSocket>
@@ -23,7 +24,10 @@ public:
   bool establishConnection(qintptr socketDescriptor);
 
   const QString &name() const { return name_; }
-  void setName(const QString &name) { name_ = name; }
+  void setName(const QString &name) {
+    name_ = name;
+    qDebug() << "Client" << socketDescriptor_ << "logged in as" << name_;
+  }
 
   void setRoom(Room *room = nullptr) { room_ = room; }
 

@@ -13,7 +13,7 @@ public:
 
   virtual const QString *intro() const;
 
-  virtual bool execute(const QString &input, QString *output);
+  virtual bool execute(const QString &input, QStringList *output);
   virtual bool finished();
 
 signals:
@@ -26,17 +26,19 @@ private:
 
 class Command : public Protocol {
 public:
+  static QString ParseHead(const QString &line);
+
   Command();
   ~Command() override;
 
-  bool execute(const QString &input, QString *output) override;
+  const QString *intro() const override;
+  bool execute(const QString &input, QStringList *output) override;
   bool finished() override;
 
 private:
   struct Argument {
     QString name;
     QString description;
-    std::function<bool(const QString &)> validator;
   };
 
   std::vector<Argument> args_;

@@ -1,7 +1,5 @@
 #include "client.h"
 
-#include <QDebug>
-
 #include "room.h"
 #include "hall.h"
 
@@ -66,11 +64,11 @@ void Client::processPendingMessages() {
   while (!pendingMessages_.empty()) {
     const QString &msg = pendingMessages_.front();
     if (!protocols_.empty()) {
-      QString response;
+      QStringList response;
       if (protocols_.top()->execute(msg, &response)) {
         protocols_.pop();
       }
-      if (!response.isEmpty()) writeMessage(response);
+      if (!response.isEmpty()) transmit(response);
     } else {
       qDebug() << "ignore message" << msg;
     }

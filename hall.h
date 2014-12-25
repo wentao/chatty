@@ -21,6 +21,11 @@ public:
 
   void welcome(Client *client) override;
 
+  void setupRooms() {
+    CreateRoom("1").first->startLooper();
+    CreateRoom("2").first->startLooper();
+  }
+
 signals:
   void newConnection(qintptr socketDescriptor);
 
@@ -46,7 +51,7 @@ public:
   ~Login() override;
 
   const QString *intro() const override;
-  bool execute(const QString &input, QString *output) override;
+  bool execute(const QString &input, QStringList *output) override;
   bool finished() override;
 
 private:
@@ -63,7 +68,7 @@ public:
   ~HallAction() override;
 
   const QString *intro() const override;
-  bool execute(const QString &input, QString *output) override;
+  bool execute(const QString &input, QStringList *output) override;
   bool finished() override;
 
 private:
