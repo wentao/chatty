@@ -1,7 +1,7 @@
 Chatty: A Simple TCP-Socket Chat Server Written In C++/QT
 =========================================================
 
-# Server: Build & Run
+## Server: Build & Run
 
 The server is implemented in C++ with
 [QT](http://qt-project.org). Although I only tested the compilation
@@ -23,7 +23,7 @@ warnings. Now run the binary with
 
 The server will start and listen on port 8237.
 
-# Client: How-To
+## Client: How-To
 
 It's encouraged to use `telnet` to communicate with the server. You
 can initiate the connection by running
@@ -115,9 +115,9 @@ Now if you use the command
 
 You will be disconnected from the server.
 
-# Hints
+## Hints
 
-## Optional command arguments
+### Optional command arguments
 
 To run commands followed by arguments, such as `/join`, `/whisper`,
 you don't have to complete all arguments in a single shot. Instead,
@@ -137,7 +137,7 @@ separately. For example
 
 `> To wensa: hey there`
 
-## Private room
+### Private room
 
 The command `\create` has an optional argument that specifices a pin
 code to protect the room.
