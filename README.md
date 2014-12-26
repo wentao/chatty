@@ -115,7 +115,7 @@ Now if you use the command
 
 You will be disconnected from the server.
 
-## Hints
+## Extras & Hints
 
 ### Optional command arguments
 
