@@ -170,6 +170,7 @@ bool Join::execute(QStringList *output) {
 Create::Create(Hall *hall, Client *client)
   : Command(), hall_(hall), client_(client) {
   AddArgument("name", "the name of the room to create");
+  AddArgument("pin", "the pin code to enter the room", true);
 }
 
 Create::~Create() {

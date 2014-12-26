@@ -21,11 +21,11 @@ QString Command::ParseHead(const QString &line) {
 Command::Command() : Protocol(), index_(0), firstExecution_(true) {}
 Command::~Command() {}
 
-Command::Argument::Argument(const QString &n, const QString &desc)
-  : name(n), description(desc) {}
+Command::Argument::Argument(const QString &n, const QString &desc, bool b)
+  : name(n), description(desc), optional(b) {}
 
-void Command::AddArgument(const QString &n, const QString &desc) {
-  args_.emplace_back(n, desc);
+void Command::AddArgument(const QString &n, const QString &desc, bool optional) {
+  args_.emplace_back(n, desc, optional);
 }
 
 const QString* Command::intro() const { return nullptr; }
@@ -44,7 +44,7 @@ bool Command::execute(const QString &input, QStringList *output) {
     int from = 0, to = -1;
     forever {
       if (from > 0 && index_ == args_.size() - 1) {
-        QString last = text.right(text.size() - from);
+        QString last = text.right(text.size() - from).trimmed();
         if (!last.isEmpty()) {
           args_[index_++].value = last;
         }
@@ -54,6 +54,12 @@ bool Command::execute(const QString &input, QStringList *output) {
       QRegExp r(kWhitespaces);
       to = text.indexOf(r, from);
       if (to == -1 || r.matchedLength() == -1) {
+        if (from > 0) {
+          QString last = text.right(text.size() - from).trimmed();
+          if (!last.isEmpty()) {
+            args_[index_++].value = last;
+          }
+        }
         break;
       }
       if (from > 0) {
@@ -71,6 +77,9 @@ bool Command::execute(const QString &input, QStringList *output) {
   if (!ok) {
     *output << args_[index_].description;
     output->last().prepend("Please enter ");
+    if (args_[index_].optional) {
+      output->last().prepend("[OPTIONAL] ");
+    }
     output->last().append(", or type /abort to cancel the action");
   }
   return ok;

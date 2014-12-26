@@ -33,11 +33,14 @@ protected:
     QString name;
     QString description;
     QString value;
+    bool optional;
 
-    Argument(const QString &n, const QString &desc);
+    Argument(const QString &name,
+             const QString &description,
+             bool optional = false);
   };
 
-  void AddArgument(const QString &n, const QString &desc);
+  void AddArgument(const QString &n, const QString &desc, bool optional = false);
 
   // This method will be called when all arguments values are fulfilled.
   virtual bool execute(QStringList *output) = 0;
