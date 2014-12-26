@@ -44,22 +44,14 @@ unique among all logged in users). Let's say we enter the name
 `> Welcome wensa!`
 
 Now you are connected to the server. However, you aren't able to talk
-to anyone until you enter a chat room. You can either use the command
-`/rooms` to list existing chat rooms, or the command `/create` to
-create a new chat room. There is a limit on the maximum number of chat
-rooms, defaulting to 20.
-
-`/create playchatty`
-
-`> Room playchatty created.`
+to anyone until you enter a chat room. You can use the command
+`/rooms` to list existing chat rooms
 
 `/rooms`
 
 `>  * default`
 
-`>  * playchatty`
-
-To join a chat room, you can use
+Then use `/join` to join a chat room
 
 `/join playchatty`
 
@@ -91,16 +83,6 @@ Then if `asnew` replied with `hey`, you will get a message like
 
 `> asnew: hey`
 
-If you want to send a message to someone privately, you can use
-
-`/whisper asnew where are you?`
-
-`> To asnew: where are you?`
-
-What `asnew` will see on his end is something like
-
-`> From wensa: where are you?`
-
 If you are done with the chat, you can leave the chat room by using
 
 `/leave`
@@ -116,6 +98,19 @@ Now if you use the command
 You will be disconnected from the server.
 
 ## Extras & Hints
+
+### Private messages
+
+If you want to send a message to someone in a chat room privately, you
+can use
+
+`/whisper asnew where are you?`
+
+`> To asnew: where are you?`
+
+What `asnew` will see on his end is something like
+
+`> From wensa: where are you?`
 
 ### Optional command arguments
 
@@ -137,10 +132,18 @@ separately. For example
 
 `> To wensa: hey there`
 
-### Private room
+### Creating chat rooms
 
-The command `\create` has an optional argument that specifices a pin
-code to protect the room.
+By default, there is only one chat room `default`. You can create more
+chat rooms by using
+
+`/create private`
+
+`> [OPTIONAL] Please enter the pin code to enter the room, or type /abort to cancel the action`
+
+You can skip the optional pin argument if you want your chat room to
+be public (anyone can join). If you enter a non-empty pin code, or you
+use the following command
 
 `/create private pincode`
 
@@ -152,8 +155,8 @@ code to protect the room.
 
 `>  * private (** pin required)`
 
-When a user wants to join the room protected by a pin, he is required
-to enter the pin.
+You will see that a `private` room was created. When a user wants to
+join the room protected by a pin, he is required to enter the pin.
 
 `/join private`
 
@@ -165,8 +168,10 @@ to enter the pin.
 
 `> Please enter the pin for the room, or enter /abort the cancel.`
 
-`pin`
+`pincode`
 
 `> Joining room: private`
 
 `>  * wensa (** this is you)`
+
+Please note the server only support 20 chat rooms at maximum.
