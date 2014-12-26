@@ -116,3 +116,24 @@ Now if you use the command
 `Connection closed by foreign host.`
 
 You will be disconnected from the server.
+
+Hints
+-----
+
+To run commands followed by arguments, such as `/join`, `/whisper`,
+you don't have to complete all arguments in a single shot. Instead,
+you can just type the command name itself, then the server will walk
+you through a wizard dialog to allow you enter individual arguments
+separately. For example
+
+`/whisper`
+
+`> Please enter the name of the person to whisper, or type /abort to cancel the action`
+
+`wensa`
+
+`> Please enter the message to send, or type /abort to cancel the action`
+
+`hey there`
+
+`> To wensa: hey there`
