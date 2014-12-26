@@ -13,6 +13,7 @@
 class Login;
 class HallAction;
 class Join;
+class Create;
 
 class Hall : public Room {
   Q_OBJECT
@@ -23,8 +24,7 @@ public:
   void welcome(Client *client) override;
 
   void setupRooms() {
-    CreateRoom("1").first->startLooper();
-    CreateRoom("2").first->startLooper();
+    CreateRoom("default").first->startLooper();
   }
 
 signals:
@@ -37,15 +37,16 @@ public slots:
 private:
   static Hall hall_;
   static std::map<QString, Room *> opens_;
+  static std::pair<Room *, bool> CreateRoom(const QString &name);
 
   explicit Hall(QObject *parent = 0);
-  std::pair<Room *, bool> CreateRoom(const QString &name);
 
   std::map<QString, Client *> users_;
 
   friend class Login;
   friend class HallAction;
   friend class Join;
+  friend class Create;
 };
 
 class Login : public Protocol {
@@ -85,6 +86,21 @@ class Join : public Command {
 public:
   Join(Hall *hall, Client *client);
   ~Join() override;
+
+  using Command::execute;
+
+protected:
+  bool execute(QStringList *output) override;
+
+private:
+  Hall *hall_;
+  Client *client_;
+};
+
+class Create : public Command {
+public:
+  Create(Hall *hall, Client *client);
+  ~Create() override;
 
   using Command::execute;
 

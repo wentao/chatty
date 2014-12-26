@@ -3,7 +3,7 @@
 (
     echo "name"$1;
     sleep 2;
-    echo "/join 1";
+    echo "/join default";
     sleep 2;
     echo "hello";
     sleep 2;

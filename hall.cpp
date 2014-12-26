@@ -53,7 +53,7 @@ void Hall::quit(Client *client) {
 QString Login::welcome_("Welcome to chatty, please tell us your name:");
 
 Login::Login(Hall *hall, Client *client)
-    : Protocol(), hall_(hall), client_(client), name_("") {}
+  : Protocol(), hall_(hall), client_(client), name_("") {}
 
 Login::~Login() {
   qDebug() << "Login protocol destroyed";
@@ -96,7 +96,7 @@ const char *kActionJoin = "/join";
 QString HallAction::actionList_("Commands you can use: /rooms, /create, /join, /quit.");
 
 HallAction::HallAction(Hall *hall, Client *client)
-    : Protocol(), hall_(hall), client_(client) {}
+  : Protocol(), hall_(hall), client_(client) {}
 
 HallAction::~HallAction() {
   qDebug() << "HallAction protocol destroyed";
@@ -104,14 +104,26 @@ HallAction::~HallAction() {
 
 const QString *HallAction::intro() const { return nullptr; }
 
+const int kMaxRoomCount = 20;
+
 bool HallAction::execute(const QString &input, QStringList* output) {
   QString head = Command::ParseHead(input);
   if (head == kActionRooms) {
     for (auto it : hall_->opens_) {
-      *output << it.first;
+      *output << " * ";
+      output->last().append(it.first);
     }
   } else if (head == kActionCreate) {
-    *output << "create";
+    if (Hall::opens_.size() >= kMaxRoomCount) {
+      *output << QString("Maximum room count reached: %1").arg(kMaxRoomCount);
+    } else {
+      Create* create = new Create(hall_, client_);
+      if (!create->execute(input, output)) {
+        client_->registerProtocol(create);
+      } else {
+        delete create;
+      }
+    }
   } else if (head == kActionQuit) {
     emit client_->closeConnection();
     *output << "BYE!";
@@ -155,3 +167,26 @@ bool Join::execute(QStringList *output) {
   }
 }
 
+Create::Create(Hall *hall, Client *client)
+  : Command(), hall_(hall), client_(client) {
+  AddArgument("name", "the name of the room to create");
+}
+
+Create::~Create() {
+  qDebug() << "Create protocol destroyed";
+}
+
+bool Create::execute(QStringList *output) {
+  auto r = Hall::CreateRoom(args_[0].value);
+  if (r.second) {
+    *output << "Room ";
+    output->last().append(args_[0].value).append(" created.");
+    return true;
+  } else {
+    *output << "Room ";
+    output->last().append(args_[0].value);
+    output->last().append(" already exists. Try another:");
+    index_ = 0;
+    return false;
+  }
+}
