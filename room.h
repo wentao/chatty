@@ -1,7 +1,7 @@
 #ifndef ROOM_H
 #define ROOM_H
 
-#include <set>
+#include <map>
 
 #include <QObject>
 #include <QString>
@@ -13,6 +13,7 @@ class Client;
 class Hall;
 
 class Talk;
+class Whisper;
 
 class Room : public QObject {
   Q_OBJECT
@@ -41,10 +42,11 @@ protected:
   QString name_;
   QThread looper_;
 
-  std::set<Client*> users_;
+  std::map<QString, Client *> users_;
 
   friend class Hall;
   friend class Talk;
+  friend class Whisper;
 };
 
 class Talk : public Protocol {
@@ -53,6 +55,21 @@ public:
   ~Talk() override;
 
   bool execute(const QString &input, QStringList *output) override;
+
+private:
+  Room *room_;
+  Client *client_;
+};
+
+class Whisper : public Command {
+public:
+  Whisper(Room *room, Client *client);
+  ~Whisper() override;
+
+  using Command::execute;
+
+protected:
+  bool execute(QStringList *output) override;
 
 private:
   Room *room_;
