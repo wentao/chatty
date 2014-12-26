@@ -5,18 +5,13 @@
 #include "client.h"
 
 Room::Room(const QString &name, const QString &pin, QObject *parent)
-  : QObject(parent), name_(name), pin_(pin), looper_(parent) {
+  : Server(parent), name_(name), pin_(pin) {
   connect(this, &Room::join, this, &Room::joined);
-  connect(this, &Room::leave, this, &Room::left);
+  connect(this, &Server::leave, this, &Room::left);
 }
 
 Room::~Room() {
   qDebug() << "Room" << name_ << "destroyed";
-}
-
-void Room::startLooper() {
-  looper_.start();
-  moveToThread(&looper_);
 }
 
 void Room::welcome(Client *client) {
@@ -69,7 +64,9 @@ const char *kActionWhisper = "/whisper";
 
 Talk::Talk(Room *room, Client *client) : room_(room), client_(client) {}
 
-Talk::~Talk() {}
+Talk::~Talk() {
+  qDebug() << "Talk protocol destroyed";
+}
 
 bool Talk::execute(const QString &input, QStringList *output) {
   QString head = Command::ParseHead(input);

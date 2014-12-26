@@ -16,7 +16,8 @@ SOURCES += main.cpp \
     tcpserver.cpp \
     hall.cpp \
     protocol.cpp \
-    tcphandle.cpp
+    tcphandle.cpp \
+    server.cpp
 
 HEADERS += \
     room.h \
@@ -24,4 +25,5 @@ HEADERS += \
     tcpserver.h \
     hall.h \
     protocol.h \
-    tcphandle.h
+    tcphandle.h \
+    server.h

@@ -1,14 +1,14 @@
 #ifndef HALL_H
 #define HALL_H
 
-#include "room.h"
-
 #include <map>
 #include <utility>
 
 #include <qglobal.h>
 
+#include "room.h"
 #include "protocol.h"
+#include "server.h"
 
 class Login;
 class Pin;
@@ -16,7 +16,7 @@ class HallAction;
 class Join;
 class Create;
 
-class Hall : public Room {
+class Hall : public Server {
   Q_OBJECT
 public:
   static Hall *Get() { return &hall_; }

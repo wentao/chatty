@@ -7,7 +7,8 @@
 #include <QString>
 #include <QThread>
 
-#include <protocol.h>
+#include "protocol.h"
+#include "server.h"
 
 class Client;
 class Hall;
@@ -15,20 +16,18 @@ class Hall;
 class Talk;
 class Whisper;
 
-class Room : public QObject {
+class Room : public Server {
   Q_OBJECT
 public:
   ~Room() override;
 
-  void startLooper();
-  virtual void welcome(Client *client);
+  void welcome(Client *client) override;
 
   const QString &name() const { return name_; }
   const QString &pin() const { return pin_; }
 
 signals:
   void join(Client* client);
-  void leave(Client* client);
 
 public slots:
   void joined(Client* client);
@@ -42,7 +41,6 @@ protected:
 
   QString name_;
   QString pin_;
-  QThread looper_;
 
   std::map<QString, Client *> users_;
 

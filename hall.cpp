@@ -9,11 +9,9 @@ Hall Hall::hall_;
 
 std::map<QString, Room *> Hall::opens_;
 
-Hall::Hall(QObject *parent) : Room("", "", parent) {
+Hall::Hall(QObject *parent) : Server(parent) {
   connect(this, &Hall::newConnection, &Hall::newClient);
-
-  disconnect(this, &Room::leave, this, &Room::left);
-  connect(this, &Room::leave, this, &Hall::quit);
+  connect(this, &Server::leave, this, &Hall::quit);
 }
 
 Hall::~Hall() {}

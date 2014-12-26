@@ -6,6 +6,8 @@
     sleep 2;
     echo "/create room"$1;
     sleep 2;
+    echo "";
+    sleep 2;
     echo "/join default";
     sleep 2;
     echo "hello";
