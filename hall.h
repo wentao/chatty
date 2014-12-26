@@ -11,6 +11,7 @@
 #include "protocol.h"
 
 class Login;
+class Pin;
 class HallAction;
 class Join;
 class Create;
@@ -44,6 +45,7 @@ private:
   std::map<QString, Client *> users_;
 
   friend class Login;
+  friend class Pin;
   friend class HallAction;
   friend class Join;
   friend class Create;
@@ -64,6 +66,24 @@ private:
   Hall *hall_;
   Client *client_;
   QString name_;
+};
+
+class Pin : public Protocol {
+public:
+  Pin(Hall *hall, Room *room, Client *client);
+  ~Pin() override;
+
+  const QString *intro() const override;
+  bool execute(const QString &input, QStringList *output) override;
+  bool finished() override;
+
+private:
+  static QString msg_;
+
+  Hall *hall_;
+  Room *room_;
+  Client *client_;
+  bool pass_;
 };
 
 class HallAction : public Protocol {

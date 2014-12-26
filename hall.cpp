@@ -88,6 +88,41 @@ bool Login::execute(const QString &input, QStringList* output) {
 
 bool Login::finished() { return name_.length() > 0; }
 
+const char *kActionAbort = "/abort";
+
+QString Pin::msg_("Please enter the pin for the room, or enter /abort the cancel.");
+
+Pin::Pin(Hall *hall, Room *room, Client *client)
+  : Protocol(), hall_(hall), room_(room), client_(client), pass_(false) {}
+
+Pin::~Pin() {
+  qDebug() << "Pin protocol destroyed";
+}
+
+const QString *Pin::intro() const { return &msg_; }
+
+bool Pin::execute(const QString &input, QStringList* output) {
+  if (Command::ParseHead(input) == kActionAbort) {
+    *output << "Room not joined";
+    pass_ = true;
+  } else {
+    QString trial = input.trimmed();
+    if (room_->pin() == trial) {
+      *output << "Joining room: ";
+      output->last().append(room_->name());
+      emit client_->join(room_);
+      pass_ = true;
+    } else {
+      *output << "Incorrect pin!";
+      *output << msg_;
+      pass_ = false;
+    }
+  }
+  return pass_;
+}
+
+bool Pin::finished() { return pass_; }
+
 const char *kActionRooms = "/rooms";
 const char *kActionCreate = "/create";
 const char *kActionQuit = "/quit";
@@ -163,9 +198,13 @@ bool Join::execute(QStringList *output) {
     index_ = 0;
     return false;
   } else {
-    *output << "Joining room: ";
-    output->last().append(args_[0].value);
-    client_->join(it->second);
+    if (it->second->pin().isEmpty()) {
+      *output << "Joining room: ";
+      output->last().append(args_[0].value);
+      emit client_->join(it->second);
+    } else {
+      emit client_->registerProtocol(new Pin(hall_, it->second, client_));
+    }
     return true;
   }
 }

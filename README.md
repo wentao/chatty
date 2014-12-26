@@ -120,6 +120,8 @@ You will be disconnected from the server.
 Hints
 -----
 
+# Optional command arguments #
+
 To run commands followed by arguments, such as `/join`, `/whisper`,
 you don't have to complete all arguments in a single shot. Instead,
 you can just type the command name itself, then the server will walk
@@ -137,3 +139,37 @@ separately. For example
 `hey there`
 
 `> To wensa: hey there`
+
+# Private room #
+
+The command `\create` has an optional argument that specifices a pin
+code to protect the room.
+
+`/create private pincode`
+
+`> Room private created.`
+
+`/rooms`
+
+`>  * default`
+
+`>  * private (** pin required)`
+
+When a user wants to join the room protected by a pin, he is required
+to enter the pin.
+
+`/join private`
+
+`> Please enter the pin for the room, or enter /abort the cancel.`
+
+`guess`
+
+`> Incorrect pin!`
+
+`> Please enter the pin for the room, or enter /abort the cancel.`
+
+`pin`
+
+`> Joining room: private`
+
+`>  * wensa (** this is you)`

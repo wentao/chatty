@@ -53,7 +53,7 @@ void Client::socketReady(TcpHandle *socket) {
   buffer_.clear();
 
   connect(this, &Client::send, &Client::transmit);
-  connect(this, &Client::registerProtocol, &Client::protocolRegistration);
+  connect(this, &Client::registerProtocol, this, &Client::protocolRegistration, Qt::QueuedConnection);
   connect(this, &Client::closeConnection, &Client::disconnectedFromServer);
   emit connected();
 }
