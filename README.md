@@ -53,9 +53,9 @@ to anyone until you enter a chat room. You can use the command
 
 Then use `/join` to join a chat room
 
-`/join playchatty`
+`/join default`
 
-`> Joining room: playchatty`
+`> Joining room: default`
 
 `>  * wensa (** this is you)`
 
@@ -87,7 +87,7 @@ If you are done with the chat, you can leave the chat room by using
 
 `/leave`
 
-`> You left the room: playchatty`
+`> You left the room: default`
 
 Now if you use the command
 
@@ -137,13 +137,10 @@ separately. For example
 By default, there is only one chat room `default`. You can create more
 chat rooms by using
 
-`/create private`
-
-`> [OPTIONAL] Please enter the pin code to enter the room, or type /abort to cancel the action`
+`/create <roomname> [pin]`
 
 You can skip the optional pin argument if you want your chat room to
-be public (anyone can join). If you enter a non-empty pin code, or you
-use the following command
+be public (anyone can join). Otherwise
 
 `/create private pincode`
 
@@ -174,4 +171,4 @@ join the room protected by a pin, he is required to enter the pin.
 
 `>  * wensa (** this is you)`
 
-Please note the server only support 20 chat rooms at maximum.
+Please note the server only supports 20 chat rooms at maximum.
