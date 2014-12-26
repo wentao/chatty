@@ -7,7 +7,7 @@ Protocol::Protocol() {}
 Protocol::~Protocol() {}
 
 const QString* Protocol::intro() const { return nullptr; }
-bool Protocol::execute(const QString &input, QStringList *output) { return true; }
+bool Protocol::execute(const QString &, QStringList *) { return true; }
 bool Protocol::finished() { return true; }
 
 const QRegExp kWhitespaces("\\s+");

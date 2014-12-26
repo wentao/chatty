@@ -24,6 +24,7 @@ public:
   virtual void welcome(Client *client);
 
   const QString &name() const { return name_; }
+  const QString &pin() const { return pin_; }
 
 signals:
   void join(Client* client);
@@ -34,12 +35,13 @@ public slots:
   void left(Client* client);
 
 protected:
-  Room(const QString &name, QObject *parent = 0);
+  Room(const QString &name, const QString &pin, QObject *parent = 0);
 
   QStringList userNameList(Client *client = 0);
   void broadcast(QStringList msg, Client *except = 0);
 
   QString name_;
+  QString pin_;
   QThread looper_;
 
   std::map<QString, Client *> users_;

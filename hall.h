@@ -37,7 +37,7 @@ public slots:
 private:
   static Hall hall_;
   static std::map<QString, Room *> opens_;
-  static std::pair<Room *, bool> CreateRoom(const QString &name);
+  static std::pair<Room *, bool> CreateRoom(const QString &name, const QString &pin = "");
 
   explicit Hall(QObject *parent = 0);
 
@@ -99,17 +99,13 @@ private:
 
 class Create : public Command {
 public:
-  Create(Hall *hall, Client *client);
+  Create();
   ~Create() override;
 
   using Command::execute;
 
 protected:
   bool execute(QStringList *output) override;
-
-private:
-  Hall *hall_;
-  Client *client_;
 };
 
 #endif // HALL_H

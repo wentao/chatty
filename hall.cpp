@@ -8,7 +8,7 @@ Hall Hall::hall_;
 
 std::map<QString, Room *> Hall::opens_;
 
-Hall::Hall(QObject *parent) : Room("", parent) {
+Hall::Hall(QObject *parent) : Room("", "", parent) {
   connect(this, &Hall::newConnection, &Hall::newClient);
 
   disconnect(this, &Room::leave, this, &Room::left);
@@ -17,10 +17,10 @@ Hall::Hall(QObject *parent) : Room("", parent) {
 
 Hall::~Hall() {}
 
-std::pair<Room *, bool> Hall::CreateRoom(const QString &name) {
+std::pair<Room *, bool> Hall::CreateRoom(const QString &name, const QString &pin) {
   auto it = opens_.find(name);
   if (it == opens_.end()) {
-    Room *room = new Room(name);
+    Room *room = new Room(name, pin);
     opens_[name] = room;
     return std::make_pair(room, true);
   } else {
@@ -112,12 +112,15 @@ bool HallAction::execute(const QString &input, QStringList* output) {
     for (auto it : hall_->opens_) {
       *output << " * ";
       output->last().append(it.first);
+      if (!it.second->pin().isEmpty()) {
+        output->last().append(" (** pin required)");
+      }
     }
   } else if (head == kActionCreate) {
     if (Hall::opens_.size() >= kMaxRoomCount) {
       *output << QString("Maximum room count reached: %1").arg(kMaxRoomCount);
     } else {
-      Create* create = new Create(hall_, client_);
+      Create* create = new Create;
       if (!create->execute(input, output)) {
         client_->registerProtocol(create);
       } else {
@@ -167,8 +170,7 @@ bool Join::execute(QStringList *output) {
   }
 }
 
-Create::Create(Hall *hall, Client *client)
-  : Command(), hall_(hall), client_(client) {
+Create::Create() : Command() {
   AddArgument("name", "the name of the room to create");
   AddArgument("pin", "the pin code to enter the room", true);
 }
@@ -178,7 +180,7 @@ Create::~Create() {
 }
 
 bool Create::execute(QStringList *output) {
-  auto r = Hall::CreateRoom(args_[0].value);
+  auto r = Hall::CreateRoom(args_[0].value, args_[1].value);
   if (r.second) {
     *output << "Room ";
     output->last().append(args_[0].value).append(" created.");

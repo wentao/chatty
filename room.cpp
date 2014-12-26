@@ -4,8 +4,8 @@
 
 #include "client.h"
 
-Room::Room(const QString &name, QObject *parent)
-  : QObject(parent), name_(name), looper_(parent) {
+Room::Room(const QString &name, const QString &pin, QObject *parent)
+  : QObject(parent), name_(name), pin_(pin), looper_(parent) {
   connect(this, &Room::join, this, &Room::joined);
   connect(this, &Room::leave, this, &Room::left);
 }
