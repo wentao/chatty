@@ -34,13 +34,14 @@ protected:
     QString description;
     QString value;
     bool optional;
+    bool token;
 
     Argument(const QString &name,
              const QString &description,
              bool optional = false);
   };
 
-  void AddArgument(const QString &n, const QString &desc, bool optional = false);
+  Argument *AddArgument(const QString &n, const QString &desc, bool optional = false);
 
   // This method will be called when all arguments values are fulfilled.
   virtual bool execute(QStringList *output) = 0;

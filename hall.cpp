@@ -3,6 +3,7 @@
 #include "client.h"
 
 #include <QStringList>
+#include <QRegExp>
 
 Hall Hall::hall_;
 
@@ -52,6 +53,8 @@ void Hall::quit(Client *client) {
 
 QString Login::welcome_("Welcome to chatty, please tell us your name:");
 
+const QRegExp kWhitespaces("\\s+");
+
 Login::Login(Hall *hall, Client *client)
   : Protocol(), hall_(hall), client_(client), name_("") {}
 
@@ -65,19 +68,18 @@ bool Login::execute(const QString &input, QStringList* output) {
   QString name = input.trimmed();
   QString msg;
   if (hall_->users_.find(name) != hall_->users_.end()) {
-    msg.append("Sorry, ");
-    msg.append(name);
-    msg.append(" already taken, try another?");
+    msg.append("Sorry, ").append(name).append(" already taken, try another?");
     *output << msg;
     return false;
   } else if (name.length() == 0) {
-    msg.append("Name can't be empty!");
+    msg.append("Name can't be empty! Try another?");
     *output << msg;
     return false;
+  } else if (name.indexOf(kWhitespaces) > -1) {
+    *output << "Don't accept string with whitespaces in the middle! Try another";
+    return false;
   } else {
-    msg.append("Welcome ");
-    msg.append(name);
-    msg.append("!");
+    msg.append("Welcome ").append(name).append("!");
     *output << msg;
     name_ = name;
     hall_->users_[name] = client_;
@@ -92,8 +94,8 @@ const char *kActionAbort = "/abort";
 
 QString Pin::msg_("Please enter the pin for the room, or enter /abort the cancel.");
 
-Pin::Pin(Hall *hall, Room *room, Client *client)
-  : Protocol(), hall_(hall), room_(room), client_(client), pass_(false) {}
+Pin::Pin(Room *room, Client *client)
+  : Protocol(), room_(room), client_(client), pass_(false) {}
 
 Pin::~Pin() {
   qDebug() << "Pin protocol destroyed";
@@ -203,7 +205,7 @@ bool Join::execute(QStringList *output) {
       output->last().append(args_[0].value);
       emit client_->join(it->second);
     } else {
-      emit client_->registerProtocol(new Pin(hall_, it->second, client_));
+      emit client_->registerProtocol(new Pin(it->second, client_));
     }
     return true;
   }

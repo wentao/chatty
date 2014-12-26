@@ -70,7 +70,7 @@ private:
 
 class Pin : public Protocol {
 public:
-  Pin(Hall *hall, Room *room, Client *client);
+  Pin(Room *room, Client *client);
   ~Pin() override;
 
   const QString *intro() const override;
@@ -80,7 +80,6 @@ public:
 private:
   static QString msg_;
 
-  Hall *hall_;
   Room *room_;
   Client *client_;
   bool pass_;

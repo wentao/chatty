@@ -22,10 +22,11 @@ Command::Command() : Protocol(), index_(0), firstExecution_(true) {}
 Command::~Command() {}
 
 Command::Argument::Argument(const QString &n, const QString &desc, bool b)
-  : name(n), description(desc), optional(b) {}
+  : name(n), description(desc), optional(b), token(false) {}
 
-void Command::AddArgument(const QString &n, const QString &desc, bool optional) {
+Command::Argument* Command::AddArgument(const QString &n, const QString &desc, bool optional) {
   args_.emplace_back(n, desc, optional);
+  return &args_.back();
 }
 
 const QString* Command::intro() const { return nullptr; }
@@ -45,9 +46,7 @@ bool Command::execute(const QString &input, QStringList *output) {
     forever {
       if (from > 0 && index_ == args_.size() - 1) {
         QString last = text.right(text.size() - from).trimmed();
-        if (!last.isEmpty()) {
-          args_[index_++].value = last;
-        }
+        args_[index_++].value = last;
         break;
       }
 
@@ -56,19 +55,21 @@ bool Command::execute(const QString &input, QStringList *output) {
       if (to == -1 || r.matchedLength() == -1) {
         if (from > 0) {
           QString last = text.right(text.size() - from).trimmed();
-          if (!last.isEmpty()) {
-            args_[index_++].value = last;
-          }
+          args_[index_++].value = last;
         }
         break;
       }
       if (from > 0) {
         // skip the first match (head)
-        QString part = text.mid(from, to - from);
+        QString part = text.mid(from, to - from).trimmed();
         args_[index_++].value = part;
       }
       from = to + r.matchedLength();
     }
+  } else if (text.isEmpty() && !args_[index_].optional) {
+    *output << "Don't accept empty string as argument!";
+  } else if (args_[index_].token && text.indexOf(kWhitespaces) > -1) {
+    *output << "Don't accept string with whitespaces in the middle!";
   } else {
     args_[index_++].value = text;
   }
