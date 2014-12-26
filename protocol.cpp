@@ -36,18 +36,35 @@ bool Command::execute(const QString &input, QStringList *output) {
     return true;
   }
 
+  QString text = input.trimmed();
   if (firstExecution_) {
     firstExecution_ = false;
-    QStringList args = input.split(kWhitespaces, QString::SkipEmptyParts);
-    args.removeFirst(); // remove head
-    while (index_ < args_.size() && !args.isEmpty()) {
-      args_[index_].value = args.first();
-      args.removeFirst();
-      ++index_;
+    // try to match all arguments from the input
+
+    int from = 0, to = -1;
+    forever {
+      if (from > 0 && index_ == args_.size() - 1) {
+        QString last = text.right(text.size() - from);
+        if (!last.isEmpty()) {
+          args_[index_++].value = last;
+        }
+        break;
+      }
+
+      QRegExp r(kWhitespaces);
+      to = text.indexOf(r, from);
+      if (to == -1 || r.matchedLength() == -1) {
+        break;
+      }
+      if (from > 0) {
+        // skip the first match (head)
+        QString part = text.mid(from, to - from);
+        args_[index_++].value = part;
+      }
+      from = to + r.matchedLength();
     }
   } else {
-    args_[index_].value = input.trimmed();
-    ++index_;
+    args_[index_++].value = text;
   }
 
   bool ok = index_ == args_.size() && execute(output);

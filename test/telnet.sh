@@ -16,7 +16,7 @@
     sleep 2;
     echo "/who"
     sleep 2;
-    echo "/whisper name0 secret";
+    echo "/whisper name0 i'll tell you a  **secret**";
     sleep 2;
     echo "/leave";
     sleep 2;

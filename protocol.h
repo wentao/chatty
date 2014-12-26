@@ -15,9 +15,6 @@ public:
 
   virtual bool execute(const QString &input, QStringList *output);
   virtual bool finished();
-
-private:
-  int priority_;
 };
 
 class Command : public Protocol {
