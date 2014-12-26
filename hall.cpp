@@ -212,7 +212,7 @@ bool Join::execute(QStringList *output) {
 }
 
 Create::Create() : Command() {
-  AddArgument("name", "the name of the room to create");
+  AddArgument("name", "the name of the room to create")->token = true;
   AddArgument("pin", "the pin code to enter the room", true);
 }
 

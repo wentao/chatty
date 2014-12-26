@@ -96,7 +96,7 @@ bool Talk::execute(const QString &input, QStringList *output) {
 
 Whisper::Whisper(Room *room, Client *client)
   : Command(), room_(room), client_(client) {
-  AddArgument("name", "the name of the person to whisper");
+  AddArgument("name", "the name of the person to whisper")->token = true;
   AddArgument("msg", "the message to send");
 }
 
