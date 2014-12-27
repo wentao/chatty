@@ -1,0 +1,4 @@
+check process chatty matching "chatty"
+  start program = "/etc/init.d/chatty start"
+  stop program = "/etc/init.d/chatty stop"
+  if totalmem > 300.0 MB for 5 cycles then restart

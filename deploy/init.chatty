@@ -1,0 +1,20 @@
+#!/bin/sh
+#/etc/init.d/chatty
+#
+
+case "$1" in
+    start)
+        echo "Starting chatty "
+        /home/admin/chatty/chatty >> /var/log/chatty.log 2>&1 &
+        ;;
+    stop)
+        echo "Stopping chatty"
+        killall chatty
+        ;;
+    *)
+        echo "Usage: /etc/init.d/chatty {start|stop}"
+        exit 1
+        ;;
+esac
+
+exit 0
