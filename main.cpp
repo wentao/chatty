@@ -11,7 +11,7 @@ int main(int argc, char *argv[]) {
   Hall::Get()->setupRooms();
 
   TcpServer server;
-  if (!server.listen(QHostAddress::LocalHost, 8237)) {
+  if (!server.listen(QHostAddress::AnyIPv4, 8237)) {
     qDebug() << "unable to listen TCP message, quit";
     return -1;
   }
