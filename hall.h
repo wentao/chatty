@@ -16,6 +16,8 @@ class HallAction;
 class Join;
 class Create;
 
+// This is the server instance that manages connected clients
+// who haven't joined any room yet.
 class Hall : public Server {
   Q_OBJECT
 public:
@@ -24,15 +26,20 @@ public:
 
   void welcome(Client *client) override;
 
+  // Set up the default rooms.
   void setupRooms() {
     CreateRoom("default").first->startLooper();
   }
 
 signals:
+  // Signals a new connection has been accepted by TCP socket server.
   void newConnection(qintptr socketDescriptor);
 
 public slots:
+  // Creates a new client to handle the new connection.
   void newClient(qintptr socketDescriptor);
+
+  // Processes a client has quit the Hall.
   void quit(Client *client);
 
 private:
@@ -51,6 +58,7 @@ private:
   friend class Create;
 };
 
+// The protocol that handles client's login behavior.
 class Login : public Protocol {
 public:
   Login(Hall *hall, Client *client);
@@ -68,6 +76,8 @@ private:
   QString name_;
 };
 
+// The protocol that enforce a client to enter pin code
+// before joining a private room.
 class Pin : public Protocol {
 public:
   Pin(Room *room, Client *client);
@@ -85,6 +95,8 @@ private:
   bool pass_;
 };
 
+// The protocol that delegates all actions a client can use
+// in the Hall.
 class HallAction : public Protocol {
 public:
   HallAction(Hall *hall, Client *client);
@@ -101,6 +113,7 @@ private:
   Client *client_;
 };
 
+// The protocol that progresses the client to join a room.
 class Join : public Command {
 public:
   Join(Hall *hall, Client *client);
@@ -116,6 +129,7 @@ private:
   Client *client_;
 };
 
+// The protocol that progresses the client to create a room.
 class Create : public Command {
 public:
   Create();

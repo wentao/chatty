@@ -15,6 +15,7 @@
 
 class Room;
 
+// This class maintains the TCP connection and data/states of a client.
 class Client : public QObject {
   Q_OBJECT
 public:
@@ -30,27 +31,47 @@ public:
   }
 
 signals:
+  // Send a message to the client.
+  // The strings in the QStringList will be joined with '\r\n'
   void send(QStringList msg);
+
+  // Register a new potocol on top of the existing one. Use it
+  // to drive the interaction with the client.
   void registerProtocol(Protocol *protocol);
 
+  // Signal to join a room.
   void join(Room *room);
+  // Signal to leave a room.
   void leave(Room *room);
 
+  // Actively close the connection from server.
   void closeConnection();
+
+  // Notifies the connection has been successfully established.
   void connected();
+  // Notifies the connection failed to establish.
   void connectionFailed();
 
 public slots:
+  // Processes the socket handle when it's ready to use.
   void socketReady(TcpHandle *socket);
 
+  // Processes when socket is disconnected from the client.
   void disconnectedFromClient();
+
+  // Processes when socket is disconnected from the server.
   void disconnectedFromServer();
 
+  // Processes when socket input data are buffered for read.
   void readyRead(QByteArray data);
 
+  // Processes messages received from the client.
   void processPendingMessages();
 
+  // Transmits the message to the client via socket.
   void transmit(QStringList msg);
+
+  // Performs protocol registration.
   void protocolRegistration(Protocol *protocol);
 
   void enterRoom(Room *room);

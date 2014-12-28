@@ -3,6 +3,8 @@
 
 #include <QTcpServer>
 
+// The TCP socket server that listens on new TCP connection
+// requests and create new sockets for them.
 class TcpServer : public QTcpServer {
   Q_OBJECT
 public:

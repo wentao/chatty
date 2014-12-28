@@ -8,6 +8,8 @@
 #include <QByteArray>
 #include <QThread>
 
+// The TCP socket wrapper that allows other threads to share
+// a socket to send/receive TCP data packets.
 class TcpHandle : public QTcpSocket {
   Q_OBJECT
 public:
@@ -17,9 +19,12 @@ public:
   void init();
 
 signals:
+  // Signals when new message has been received and buffered.
   void receive(QByteArray data);
+  // Signals a new message will be sent out soon.
   void send(QString msg);
 
+  // Signals to shutdown the socket.
   void shutdown();
 
 public slots:
@@ -31,6 +36,7 @@ private:
   QByteArray buffer_;
 };
 
+// The helper class to instantiate the socket handle in a dedicated thread.
 class TcpHandleCreator : public QObject, public QRunnable {
   Q_OBJECT
 public:

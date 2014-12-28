@@ -6,6 +6,7 @@
 
 class Client;
 
+// A server instance that runs its own thread (looper).
 class Server : public QObject {
   Q_OBJECT
 public:
@@ -13,6 +14,8 @@ public:
   ~Server() override;
 
   void startLooper();
+
+  // Processes when a client has been aceepted by this server.
   virtual void welcome(Client *client) = 0;
 
 signals:
